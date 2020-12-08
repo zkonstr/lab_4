@@ -1,18 +1,8 @@
 package bsu.rfe.java.group6.lab4.Zhibul.varB7;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.font.FontRenderContext;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.*;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
@@ -194,18 +184,33 @@ minY
 // Шаг 2 - Организовать цикл по всем точкам графика
         for (Double[] point : graphicsData) {
 // Инициализировать эллипс как объект для представления маркера
-            Ellipse2D.Double marker = new Ellipse2D.Double();
+            Path2D.Double marker = new Path2D.Double();
+            Point2D.Double center = xyToPoint(point[0], point[1]);
+//            System.out.println("Triangle: " + center.x + " " + center.y);
+            marker.moveTo(center.x - 5.5, center.y + 5.5);
+            marker.lineTo(center.x, center.y - 5.5);
+            marker.lineTo(center.x + 5.5, center.y + 5.5);
+            marker.closePath();
+/*
+
+            Ellipse2D.Double notmarker = new Ellipse2D.Double();
+
+*/
 /* Эллипс будет задаваться посредством указания координат
 его центра
-и угла прямоугольника, в который он вписан */
+и угла прямоугольника, в который он вписан *//*
+
+
 // Центр - в точке (x,y)
-            Point2D.Double center = xyToPoint(point[0], point[1]);
+            System.out.println("Center ellipse: " + center.x + " " + center.y);
 // Угол прямоугольника - отстоит на расстоянии (3,3)
             Point2D.Double corner = shiftPoint(center, 3, 3);
 // Задать эллипс по центру и диагонали
-            marker.setFrameFromCenter(center, corner);
+
+*/
+//            marker.setFrameFromCenter(center, corner);
             canvas.draw(marker); // Начертить контур маркера
-            canvas.fill(marker); // Залить внутреннюю область маркера
+           // canvas.fill(marker); // Залить внутреннюю область маркера
         }
     }
 
