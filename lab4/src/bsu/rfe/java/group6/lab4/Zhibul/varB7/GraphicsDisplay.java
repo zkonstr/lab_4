@@ -134,7 +134,7 @@ minY
 // Первыми (если нужно) отрисовываются оси координат.
         if (showAxis) paintAxis(canvas);
 // Затем отображается сам график
-        paintGraphics(canvas);
+        paintGraphics(canvas,false);
 // Затем (если нужно) отображаются маркеры точек, по которым строился график.
         if (showMarkers) paintMarkers(canvas);
 // Шаг 9 - Восстановить старые настройки холста
@@ -145,7 +145,7 @@ minY
     }
 
     // Отрисовка графика по прочитанным координатам
-    protected void paintGraphics(Graphics2D canvas) {
+    protected void paintGraphics(Graphics2D canvas, boolean module) {
 // Выбрать линию для рисования графика
         canvas.setStroke(graphicsStroke);
 // Выбрать цвет линии
@@ -161,6 +161,7 @@ minY
 // Преобразовать значения (x,y) в точку на экране point
             Point2D.Double point = xyToPoint(graphicsData[i][0],
                     graphicsData[i][1]);
+            if (module) { graphicsData[i][1] = Math.abs(graphicsData[i][1]); }
             if (i > 0) {
 // Не первая итерация цикла - вести линию в точку point
                 graphics.lineTo(point.getX(), point.getY());
@@ -210,7 +211,7 @@ minY
 */
 //            marker.setFrameFromCenter(center, corner);
             canvas.draw(marker); // Начертить контур маркера
-           // canvas.fill(marker); // Залить внутреннюю область маркера
+            // canvas.fill(marker); // Залить внутреннюю область маркера
         }
     }
 
@@ -225,14 +226,14 @@ minY
 // Подписи к координатным осям делаются специальным шрифтом
         canvas.setFont(axisFont);
 // Создать объект контекста отображения текста - для получения характеристик устройства (экрана)
-                FontRenderContext context = canvas.getFontRenderContext();
+        FontRenderContext context = canvas.getFontRenderContext();
 // Определить, должна ли быть видна ось Y на графике
         if (minX <= 0.0 && maxX >= 0.0) {
 // Она должна быть видна, если левая граница показываемой области(minX) <= 0.0,
 // а правая (maxX) >= 0.0
 // Сама ось - это линия между точками (0, maxY) и (0, minY)
-                    canvas.draw(new Line2D.Double(xyToPoint(0, maxY),
-                            xyToPoint(0, minY)));
+            canvas.draw(new Line2D.Double(xyToPoint(0, maxY),
+                    xyToPoint(0, minY)));
 // Стрелка оси Y
             GeneralPath arrow = new GeneralPath();
 // Установить начальную точку ломаной точно на верхний конец оси Y
@@ -260,8 +261,8 @@ minY
         if (minY <= 0.0 && maxY >= 0.0) {
 // Она должна быть видна, если верхняя граница показываемой области(maxX) >= 0.0,
 // а нижняя (minY) <= 0.0
-                    canvas.draw(new Line2D.Double(xyToPoint(minX, 0),
-                            xyToPoint(maxX, 0)));
+            canvas.draw(new Line2D.Double(xyToPoint(minX, 0),
+                    xyToPoint(maxX, 0)));
 // Стрелка оси X
             GeneralPath arrow = new GeneralPath();
 // Установить начальную точку ломаной точно на правый конец оси X
