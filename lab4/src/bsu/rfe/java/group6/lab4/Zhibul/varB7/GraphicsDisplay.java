@@ -12,6 +12,7 @@ public class GraphicsDisplay extends JPanel {
     // Флаговые переменные, задающие правила отображения графика
     private boolean showAxis = true;
     private boolean showMarkers = true;
+    private boolean showModule = false;
     // Границы диапазона пространства, подлежащего отображению
     private double minX;
     private double maxX;
@@ -21,6 +22,7 @@ public class GraphicsDisplay extends JPanel {
     private double scale;
     // Различные стили черчения линий
     private BasicStroke graphicsStroke;
+    private BasicStroke graphicsModuleStroke;
     private BasicStroke axisStroke;
     private BasicStroke markerStroke;
     // Различные шрифты отображения надписей
@@ -33,6 +35,8 @@ public class GraphicsDisplay extends JPanel {
 // Перо для рисования графика
         graphicsStroke = new BasicStroke(2.0f, BasicStroke.CAP_BUTT,
                 BasicStroke.JOIN_ROUND, 10.0f, null, 0.0f);
+        graphicsModuleStroke = new BasicStroke(2.5f, BasicStroke.CAP_BUTT,
+                BasicStroke.JOIN_MITER, 1f, new float[]{3, 3, 6, 3, 3, 3, 12, 3, 6, 3}, 0.0f);
 // Перо для рисования осей координат
         axisStroke = new BasicStroke(2.0f, BasicStroke.CAP_BUTT,
                 BasicStroke.JOIN_MITER, 10.0f, null, 0.0f);
@@ -61,6 +65,10 @@ public class GraphicsDisplay extends JPanel {
 
     public void setShowMarkers(boolean showMarkers) {
         this.showMarkers = showMarkers;
+        repaint();
+    }
+    public void setShowModule(boolean showModule) {
+        this.showModule = showModule;
         repaint();
     }
 
@@ -134,9 +142,11 @@ minY
 // Первыми (если нужно) отрисовываются оси координат.
         if (showAxis) paintAxis(canvas);
 // Затем отображается сам график
-        paintGraphics(canvas,false);
+        paintGraphics(canvas, false, Color.BLUE);
 // Затем (если нужно) отображаются маркеры точек, по которым строился график.
-        if (showMarkers) paintMarkers(canvas);
+        if (showMarkers) paintMarkers(canvas, false, Color.BLUE);
+        if (showModule) paintGraphics(canvas, true, Color.RED);
+        if (showMarkers && showModule) paintMarkers(canvas, true, Color.RED);
 // Шаг 9 - Восстановить старые настройки холста
         canvas.setFont(oldFont);
         canvas.setPaint(oldPaint);
@@ -145,11 +155,11 @@ minY
     }
 
     // Отрисовка графика по прочитанным координатам
-    protected void paintGraphics(Graphics2D canvas, boolean module) {
+    protected void paintGraphics(Graphics2D canvas, boolean isModule, Color color) {
 // Выбрать линию для рисования графика
-        canvas.setStroke(graphicsStroke);
+        canvas.setStroke(isModule ? graphicsModuleStroke : graphicsStroke);
 // Выбрать цвет линии
-        canvas.setColor(Color.RED);
+        canvas.setColor(color);
 /* Будем рисовать линию графика как путь, состоящий из множества
 сегментов (GeneralPath)
 * Начало пути устанавливается в первую точку графика, после чего
@@ -160,8 +170,7 @@ minY
         for (int i = 0; i < graphicsData.length; i++) {
 // Преобразовать значения (x,y) в точку на экране point
             Point2D.Double point = xyToPoint(graphicsData[i][0],
-                    graphicsData[i][1]);
-            if (module) { graphicsData[i][1] = Math.abs(graphicsData[i][1]); }
+                    isModule? Math.abs(graphicsData[i][1]) : graphicsData[i][1]);
             if (i > 0) {
 // Не первая итерация цикла - вести линию в точку point
                 graphics.lineTo(point.getX(), point.getY());
@@ -175,18 +184,18 @@ minY
     }
 
     // Отображение маркеров точек, по которым рисовался график
-    protected void paintMarkers(Graphics2D canvas) {
+    protected void paintMarkers(Graphics2D canvas, boolean isModule, Color color) {
 // Шаг 1 - Установить специальное перо для черчения контуров маркеров
         canvas.setStroke(markerStroke);
 // Выбрать красный цвета для контуров маркеров
-        canvas.setColor(Color.RED);
+        canvas.setColor(color);
 // Выбрать красный цвет для закрашивания маркеров внутри
-        canvas.setPaint(Color.RED);
+        canvas.setPaint(color);
 // Шаг 2 - Организовать цикл по всем точкам графика
         for (Double[] point : graphicsData) {
 // Инициализировать эллипс как объект для представления маркера
             Path2D.Double marker = new Path2D.Double();
-            Point2D.Double center = xyToPoint(point[0], point[1]);
+            Point2D.Double center = xyToPoint(point[0], isModule? Math.abs(point[1]) : point[1]);
 //            System.out.println("Triangle: " + center.x + " " + center.y);
             marker.moveTo(center.x - 5.5, center.y + 5.5);
             marker.lineTo(center.x, center.y - 5.5);

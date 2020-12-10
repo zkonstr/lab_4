@@ -91,13 +91,14 @@ public class MainFrame extends JFrame {
         showModuleMenuItem = new JCheckBoxMenuItem(new AbstractAction("Показывать функцию модуля") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                display.paintGraphics((Graphics2D) display.getGraphics(), showModuleMenuItem.isSelected());
+                display.setShowModule(showModuleMenuItem.isSelected());
             }
         });
         graphicsMenu.add(showMarkersMenuItem);
         graphicsMenu.add(showAxisMenuItem);
         graphicsMenu.add(showModuleMenuItem);
         // Элемент по умолчанию включен (отмечен флажком)
+        showAxisMenuItem.setSelected(true);
         showMarkersMenuItem.setSelected(true);
 // Зарегистрировать обработчик событий, связанных с меню "График"
         graphicsMenu.addMenuListener(new GraphicsMenuListener());
