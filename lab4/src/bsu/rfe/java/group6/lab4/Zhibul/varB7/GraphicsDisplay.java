@@ -22,6 +22,7 @@ public class GraphicsDisplay extends JPanel {
     private double scale;
     // Различные стили черчения линий
     private BasicStroke graphicsStroke;
+    private BasicStroke gridStroke;
     private BasicStroke graphicsModuleStroke;
     private BasicStroke axisStroke;
     private BasicStroke markerStroke;
@@ -33,7 +34,10 @@ public class GraphicsDisplay extends JPanel {
         setBackground(Color.WHITE);
 // Сконструировать необходимые объекты, используемые в рисовании
 // Перо для рисования графика
+
         graphicsStroke = new BasicStroke(2.0f, BasicStroke.CAP_BUTT,
+                BasicStroke.JOIN_ROUND, 10.0f, null, 0.0f);
+        gridStroke = new BasicStroke(0.5f, BasicStroke.CAP_BUTT,
                 BasicStroke.JOIN_ROUND, 10.0f, null, 0.0f);
         graphicsModuleStroke = new BasicStroke(2.5f, BasicStroke.CAP_BUTT,
                 BasicStroke.JOIN_MITER, 1f, new float[]{3, 3, 6, 3, 3, 3, 12, 3, 6, 3}, 0.0f);
@@ -234,6 +238,7 @@ minY
 
     // Метод, обеспечивающий отображение осей координат
     protected void paintAxis(Graphics2D canvas) {
+        paintGrid(canvas);
 // Установить особое начертание для осей
         canvas.setStroke(axisStroke);
 // Оси рисуются чѐрным цветом
@@ -337,5 +342,25 @@ minY
 // Задать еѐ координаты как координаты существующей точки + заданные смещения
         dest.setLocation(src.getX() + deltaX, src.getY() + deltaY);
         return dest;
+    }
+    private void paintGrid(Graphics2D canvas) {
+        canvas.setStroke(this.gridStroke);
+        canvas.setColor(Color.GRAY);
+        for (double step = 0; step >= minX; step -= 10) {
+            canvas.draw(new Line2D.Double(xyToPoint(step, maxY),
+                    xyToPoint(step, minY)));
+        }
+        for (double step = 0; step <= maxX; step += 10) {
+            canvas.draw(new Line2D.Double(xyToPoint(step, maxY),
+                    xyToPoint(step, minY)));
+        }
+        for (double step = 0; step <= maxY; step += 10) {
+            canvas.draw(new Line2D.Double(xyToPoint(minX, step),
+                    xyToPoint(maxX, step)));
+        }
+        for (double step = 0; step >= minY; step -= 10) {
+            canvas.draw(new Line2D.Double(xyToPoint(maxX, step),
+                    xyToPoint(minX, step)));
+        }
     }
 }
