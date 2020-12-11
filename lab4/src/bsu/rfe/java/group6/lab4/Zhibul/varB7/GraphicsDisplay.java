@@ -163,8 +163,7 @@ minY
 /* Будем рисовать линию графика как путь, состоящий из множества
 сегментов (GeneralPath)
 * Начало пути устанавливается в первую точку графика, после чего
-прямой соединяется со
-* следующими точками
+прямой соединяется со следующими точками
 */
         GeneralPath graphics = new GeneralPath();
         for (int i = 0; i < graphicsData.length; i++) {
@@ -188,11 +187,15 @@ minY
 // Шаг 1 - Установить специальное перо для черчения контуров маркеров
         canvas.setStroke(markerStroke);
 // Выбрать красный цвета для контуров маркеров
-        canvas.setColor(color);
+            canvas.setColor(color);
 // Выбрать красный цвет для закрашивания маркеров внутри
         canvas.setPaint(color);
 // Шаг 2 - Организовать цикл по всем точкам графика
         for (Double[] point : graphicsData) {
+            if(checkSquare(isModule ? Math.abs(point[1].intValue()) : point[1].intValue())){
+                canvas.setColor(Color.green);
+            }
+            else canvas.setColor(color);
 // Инициализировать эллипс как объект для представления маркера
             Path2D.Double marker = new Path2D.Double();
             Point2D.Double center = xyToPoint(point[0], isModule? Math.abs(point[1]) : point[1]);
@@ -222,6 +225,11 @@ minY
             canvas.draw(marker); // Начертить контур маркера
             // canvas.fill(marker); // Залить внутреннюю область маркера
         }
+    }
+
+    private boolean checkSquare(int intValue) {
+        int root = (int)Math.sqrt(intValue);
+        return root*root == intValue;
     }
 
     // Метод, обеспечивающий отображение осей координат
@@ -294,6 +302,12 @@ minY
 // Вывести надпись в точке с вычисленными координатами
             canvas.drawString("x", (float) (labelPos.getX() -
                     bounds.getWidth() - 10), (float) (labelPos.getY() + bounds.getY()));
+
+            Rectangle2D bounds0 = axisFont.getStringBounds("(0; 0)", context);
+            Point2D.Double label0Pos = xyToPoint(0, 0);
+// Вывести надпись в точке с вычисленными координатами
+            canvas.drawString("(0; 0)", (float) (label0Pos.getX() -
+                    bounds0.getWidth() +85), (float) (label0Pos.getY() + bounds0.getY()+65));
         }
     }
 
